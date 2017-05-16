@@ -36,30 +36,39 @@ int main(int argc , char *argv[])
     //keep communicating with server
     while(1)
     {
+        // get client msg
         printf("Enter message : ");
         scanf("%s" , message);
-
-        //Send request to server
-        if( send(sock , message , strlen(message) , 0) < 0)
+        /// check if the client's request has the right length
+        if(strlen(message)<=strlen("coming?"))
         {
-            puts("Send failed");
-            return 1;
-        }
 
-        //Receive a reply from the server
-        if( recv(sock , server_reply , 2000 , 0) < 0)
-        {
-            puts("recv failed");
-            break;
-        }
+            //Send request to server
+            if( send(sock , message , strlen(message) , 0) < 0)
+                {
+                    puts("Send failed");
+                    return 1;
+                  }
 
+            //Receive a reply from the server
+            if( recv(sock , server_reply , 2000 , 0) < 0)
+                {
+                    puts("recv failed");
+                    break;
+                  }
+            // print server's response
+            puts(server_reply);
 
-
-	    puts(server_reply);
-
+          }
+        else
+          {
+            // the client wrote a wrong request
+            puts("You wrote a wrong request !");
+          }
 
     }
 
+    // closing socket
     close(sock);
     return 0;
 }
