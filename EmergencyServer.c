@@ -68,7 +68,9 @@ int main(int argc , char *argv[])
     puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
     while( (client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
-    {
+    {   
+	//if(inet_ntoa(client.sin_addr)
+	printf("the client that is connected has the adress:%s \n",inet_ntoa(client.sin_addr));
         puts("Connection accepted");
         pthread_t sniffer_thread;
         new_sock = malloc(1);
@@ -108,6 +110,7 @@ void *connection_handler(void *socket_desc)
     int sock = *(int*)socket_desc;
     int read_size;
     char *message,*msg,*msg2 , client_message[2000];
+	
     //Send some messages to the client
     //message = "Greetings! I am your connection handler\n";
     //write(sock , message , strlen(message));  
@@ -116,42 +119,42 @@ void *connection_handler(void *socket_desc)
     //Receive a message from client
     while( (read_size = recv(sock , &client_message , 2000 , 0)) > 0 )
     {
-	if(are_equal(client_message,"venir"))
+	if(are_equal(client_message,"coming?"))
 	{
 	pthread_mutex_lock(&mutex);
 	if(places==0)
 		{
 		pthread_mutex_unlock(&mutex);
-		write(sock,"pas_de_places", strlen("pas_de_places"));
+		write(sock,"nope_places\n", strlen("nope_places\n"));
 		}
 	else    
 		{
 		places--;
 		pthread_mutex_unlock(&mutex);
-		msg="Vous pouvez venir\n";
+		msg="come_please\n";
 		write(sock ,msg, strlen(msg));
 		}
 		
 	}
-	else if(are_equal(client_message,"quitter"))
+	else if(are_equal(client_message,"quiting"))
 	{
 	pthread_mutex_lock(&mutex);
 	if(places==20)
 		{
 		pthread_mutex_unlock(&mutex);
-		write(sock,"n'abuser pas :)", strlen("n'abuser pas :)"));
+		write(sock,"stop_please\n", strlen("stop_please\n"));
 		}
 	else    
 		{
 		places++;
 		pthread_mutex_unlock(&mutex);
-		msg2="Vous pouvez quitter\n";
+		msg2="quit_please\n";
 		write(sock ,msg2, strlen(msg2));
 		}	
 	}
 	else
         {
-        write(sock , "rectifier votre requete\n" , strlen("rectifier votre requete\n"));
+        write(sock , "checkPlease\n" , strlen("checkPlease\n"));
 	}
 	fflush(stdout);
 	fflush(stdin);
@@ -160,6 +163,7 @@ void *connection_handler(void *socket_desc)
     {
         puts("Client disconnected");
         fflush(stdout);
+	fflush(stdin);
     }
     else if(read_size == -1)
 
